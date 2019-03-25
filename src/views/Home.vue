@@ -11,9 +11,9 @@
 			</el-col>
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="hover">
-					<span class="el-dropdown-link userinfo-inner"><img :src="this.sysUserAvatar" /> {{sysUserName}}</span>
+					<span class="el-dropdown-link userinfo-inner">{{sysUserName}}</span>
 					<el-dropdown-menu slot="dropdown">
-						<el-dropdown-item>我的消息</el-dropdown-item>
+						<!--<el-dropdown-item>我的消息</el-dropdown-item>-->
 						<el-dropdown-item>设置</el-dropdown-item>
 						<el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
 					</el-dropdown-menu>
@@ -23,7 +23,7 @@
 		<el-col :span="24" class="main">
 			<aside :class="collapsed?'menu-collapsed':'menu-expanded'">
 				<!--导航菜单-->
-				<el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect"
+				<el-menu :default-active="$route.path"  class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect"
 					 unique-opened router v-show="!collapsed">
 					<template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
 						<el-submenu :index="index+''" v-if="!item.leaf">
@@ -71,7 +71,7 @@
 	</el-row>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 	export default {
 		data() {
 			return {
@@ -96,12 +96,13 @@
 				console.log('submit!');
 			},
 			handleopen() {
-				//console.log('handleopen');
+				console.log('handleopen');
 			},
 			handleclose() {
-				//console.log('handleclose');
+				console.log('handleclose');
 			},
 			handleselect: function (a, b) {
+				console.log("handleselect....");
 			},
 			//退出登录
 			logout: function () {
@@ -129,7 +130,8 @@
 			var user = sessionStorage.getItem('user');
 			if (user) {
 				user = JSON.parse(user);
-				this.sysUserName = user.name || '';
+				console.info(user);
+				this.sysUserName = user.nickname || '';
 				this.sysUserAvatar = user.avatar || '';
 			}
 
@@ -216,7 +218,7 @@
 					height: 100%;
 				}
 				.collapsed{
-					width:60px;
+					width:600px;
 					.item{
 						position: relative;
 					}
