@@ -8,7 +8,7 @@
 					<el-button type="primary" icon="el-icon-plus" style="float: right;padding:10px 10px;" >添加</el-button>
 				</div>
 				<!--用户展示区域-->
-				<div  class="textItem">
+				<!--<div  class="textItem">
 					<div style="float: left;">
 						<div style="width: 36px; height: 36px; float:left; border-radius: 50%; border: 3px solid #eee; overflow: hidden;">
 							<img src="https://avatar.csdn.net/2/0/B/3_boonyaxnn.jpg" width="40" height="40" />
@@ -55,9 +55,23 @@
 						<div>2019-01-34 12:12:45</div>
 						<div>余额:24.5</div>
 					</div>
-				</div>
-				<div v-for="user in users" :key="user" class="text item">
+				</div>-->
+				<div v-for="user in users" :key="user"  :class="findUserClass(user)" v-on:click="doSelectUser(user)" >
+					<div style="float: left;">
+						<div style="width: 36px; height: 36px; float:left; border-radius: 50%; border: 3px solid #eee; overflow: hidden;">
+							<img  :src="findUserIcon(user.usericonURL)" width="40" height="40" />
+							{{user.usericonURL}}
+						</div>
 
+						<div style="float:right;padding-left: 7px;">
+							<div>名称</div>
+							<div>{{user.name||user.username}}</div>
+						</div>
+					</div>
+					<div style="float:right;padding-right: 10px;">
+						<div>{{user.registerDate}}</div>
+						<div>余额:{{(user.balance/100).toFixed(2)}}</div>
+					</div>
 				</div>
 			</el-card>
 			<div style="width:74%;height: 100%;float: right;">
@@ -65,10 +79,10 @@
 				<div style="width: 79%;height: 100px;border: 1px solid rgb(209, 219, 229);text-align: center;padding-left: 30px;padding-top: 30px;box-shadow: 0 2px 4px 0 rgba(0,0,0,.12), 0 0 6px 0 rgba(0,0,0,.04);">
 					<div style="float: left;width: 150px;height:100px;">
 						<div style="width: 60px; height: 60px; float:left; border-radius: 50%; border: 3px solid #eee; overflow: hidden;">
-							<img src="https://avatar.csdn.net/2/0/B/3_boonyaxnn.jpg" width="60" height="60" />
+							<img :src="findUserIcon(selectUser.usericonURL)" width="60" height="60" />
 						</div>
 						<div style="float:right;width: 80px;">
-							<div>海上</div>
+							<div>{{selectUser.name||selectUser.username}}</div>
 							<div style="border-radius: 5px;background-color: #20a0ff;color: #FFFFFF;font-weight: bold;margin-top: 15px;">已认证</div>
 						</div>
 					</div>
@@ -84,9 +98,9 @@
 				</div>
 				<div class="userBasic_2">
 					<div  class="userInfo">
-						<div>用 户 名：15120050982</div>
-						<div>绑定手机：15120050982</div>
-						<div>注册时间：2019-03-12 16:54:16</div>
+						<div>用 户 名：{{selectUser.name||selectUser.username}}</div>
+						<div>绑定手机：{{selectUser.phone}} </div>
+						<div>注册时间：{{findRegisterDate(selectUser.registerDate)}}</div>
 					</div>
 					<div class="userMoney">
 						<div class="userBalance">
@@ -102,7 +116,7 @@
     font-size: 25px;
     margin-top: 5px;
     font-weight: BOLD;">
-								100.97
+								{{(selectUser.balance/100).toFixed(2)}}
 							</div>
 						</div>
 						<div class="userOpera">
@@ -112,7 +126,7 @@
 				</div>
 
 				<div class="userDesc">
-					<div class="userSrc">用户来源：安卓端</div>
+					<div class="userSrc">用户来源：{{selectUser.channel}}</div>
 
 					<div class="userBaseInfo"><el-button type="primary" round>查看详情</el-button></div>
 					<div class="userTJ">推荐数据可见
@@ -130,17 +144,63 @@
 </template>
 <script type="text/ecmascript-6">
 	import { getUserList } from '../../api/api';
+	import moment from 'moment';
 	export default {
 		data() {
 			return {
 				users:[],
+				total:0,
+				selectUser: null,
+
 				publishOrder: true
 			}
 		},
 		methods: {
+			findUserIcon: function(url){
+				return url||"/static/images/user_def.jpeg";
+			},
+			findUserClass: function(user){
+				let className = "textItem";
+				if(user.id == this.selectUser.id){
+					className += "  textItem_select";
+				}
+				return className;
+			},
+			findRegisterDate: function (date) {
+				return moment(date).format("YYYY-MM-DD H:mm:ss")
+			},
+			doSelectUser(user){
+				this.selectUser = user;
+			},
+			doQuery: function(){
+				let self = this;
+				var params = {pageNo:1,pageSize:20 };
+				getUserList(params).then(data => {
+					this.logining = false;
+					let { msg, error_code} = data;
+					if (error_code== 1) {
+						this.$message({
+							message: msg,
+							type: 'error'
+						});
+						return;
+					}
+					let content = data.data;
+					self.total = content.total;
+					self.users = content.list;
+					if(self.users.length > 0){
+						self.selectUser = self.users[0];
+					}
 
+				});
+			}
 		},
 		mounted() {
+			/**
+			 * 具体操作步骤：
+			 * 1、获取所有的用户数据，通过分页方式进行展示；
+			 */
+			this.doQuery();
 		}
 	};
 
@@ -275,6 +335,7 @@
 
 	.textItem:hover,.textItem_1:hover{
 		background-color: #20a0ff;
+		cursor:pointer;
 	}
 
 
