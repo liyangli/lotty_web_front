@@ -33,6 +33,12 @@ module.exports = {
       },
       "/register": {
         target: url
+      },
+      "/betUser/*": {
+        target: url
+      },
+      "/order/*": {
+        target: url
       }
 
 
