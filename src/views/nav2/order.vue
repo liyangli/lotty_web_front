@@ -2,55 +2,32 @@
 	<div style="height: 100%;width:100%;">
 		<el-tabs v-model="orderType" type="card" @tab-click="handleClick">
 			<el-tab-pane label="未出票" name="1">
-				<!--第一层类型分类-->
-				<div class="type_level">
-					<div class="lotty_type " @click.prevent="opearAllClick()">
-						<label :class="first_type_checked?'is_checked':''" style="float:left;margin-right:5px;cursor: pointer" >
-							<input type="checkbox" class="el-checkbox-button__original">
-							<span >全部</span>
-						</label>
-					</div>
-
-
-
-					<div class="lotty_type " @click.prevent="opearClick(type)" v-for="type in types">
-						<label :class="type.checked?'is_checked':''" style="float:left;margin-right:5px;cursor: pointer" >
-							<input type="checkbox" v-model="type.checked"  class="el-checkbox-button__original">
-							<span >{{type.name}}</span>
-						</label>
-					</div>
-
-				</div>
-				<!--第二层分类-->
-				<div class="type_level">
-					<div class="lotty_type " @click.prevent="opearSecondAllClick()">
-						<label :class="second_type_checked?'is_checked':''" style="float:left;margin-right:5px;cursor: pointer" >
-							<input type="checkbox" class="el-checkbox-button__original">
-							<span >全部</span>
-						</label>
-					</div>
-
-
-
-					<div class="lotty_type " @click.prevent="opearSecondClick(type)" v-for="type in secondTypes">
-						<label :class="type.checked?'is_checked':''" style="float:left;margin-right:5px;cursor: pointer" >
-							<input type="checkbox" v-model="type.checked"  class="el-checkbox-button__original">
-							<span >{{type.name}}</span>
-						</label>
-					</div>
-				</div>
+				<order-list type="1"></order-list>
 			</el-tab-pane>
-			<el-tab-pane label="已出票" name="2">已出票
+			<el-tab-pane label="已出票" name="2">
+				<order-list type="2"></order-list>
 
 			</el-tab-pane>
 			<el-tab-pane label="已撤单" name="3">
-
+				<order-list type="3"></order-list>
 			</el-tab-pane>
 		</el-tabs>
+		<div class="block">
+			<el-pagination
+					@size-change="handleSizeChange"
+					@current-change="handleCurrentChange"
+					:current-page.sync="currentPage1"
+					:page-size="20"
+					layout="total, prev, pager, next"
+					:total="5">
+			</el-pagination>
+		</div>
 	</div>
+
 </template>
 <script type="text/ecmascript-6">
 	import { getUserList } from '../../api/api';
+	import orderList from './order_list.vue'
 	import moment from 'moment';
 	export default {
 		data() {
@@ -59,8 +36,30 @@
 				type_jc: '',
 				types: [],
 				secondTypes: [],
-				first_type_checked: true
+				first_type_checked: true,
+				tableData: [{
+					date: '2016-05-02',
+					name: '王小虎',
+					address: '上海市普陀区金沙江路 1518 弄'
+				}, {
+					date: '2016-05-04',
+					name: '王小虎',
+					address: '上海市普陀区金沙江路 1517 弄'
+				}, {
+					date: '2016-05-01',
+					name: '王小虎',
+					address: '上海市普陀区金沙江路 1519 弄'
+				}, {
+					date: '2016-05-03',
+					name: '王小虎',
+					address: '上海市普陀区金沙江路 1516 弄'
+				}],
+				currentPage1: 5
+
 			}
+		},
+		components: {
+			orderList
 		},
 		methods: {
 
@@ -171,10 +170,17 @@
 						checked: false
 					}]
 				}]
+			},
+			handleSizeChange(val) {
+				console.log(`每页 ${val} 条`);
+			},
+			handleCurrentChange(val) {
+				console.log(`当前页: ${val}`);
 			}
 		},
 		mounted() {
 			this.makeTypes();
+			//获取所有的订单数据；
 		}
 	};
 

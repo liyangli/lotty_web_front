@@ -7,6 +7,8 @@ export const requestRegister = params => { return axios.post(`${base}/register`,
 
 export const getUserList = params => { return axios.post(`${base}/betUser/search`, params).then(res => res.data); };
 
+export const findOrders = params => { return axios.post(`${base}/order/search`, params).then(res => res.data); };
+
 export const getUserListPage = params => { return axios.get(`${base}/user/listpage`, params); };
 
 export const removeUser = params => { return axios.get(`${base}/user/remove`, { params: params }); };
