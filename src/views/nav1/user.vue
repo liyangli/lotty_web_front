@@ -10,20 +10,20 @@
             v-style
             placeholder="请输入用户名或手机号"
           ></el-input>
-          <el-button type="primary" icon="el-icon-plus" style="float: right;padding:10px 10px;">添加</el-button>
+          <el-button @click="addBetUser()" type="primary" icon="el-icon-plus" style="float: right;padding:10px 10px;">添加</el-button>
         </div>
         <div style="height: 80%">
           <div
             v-for="(user,index) in users"
             :key="index"
             :class="findUserClass(user)"
-            v-on:click="doSelectUser(user)"
+            @click="doSelectUser(user)"
           >
             <div style="float: left;">
               <div
                 style="width: 36px; height: 36px; float:left; border-radius: 50%; border: 3px solid #eee; overflow: hidden;"
               >
-                <img :src="findUserIcon(user.usericonURL)" width="40" height="40">
+                <img :src="findUserIcon(user)" width="40" height="40">
                 {{user.usericonURL}}
               </div>
 
@@ -57,7 +57,7 @@
             <div
               style="width: 60px; height: 60px; float:left; border-radius: 50%; border: 3px solid #eee; overflow: hidden;"
             >
-              <img :src="findUserIcon(selectUser.usericonURL)" width="60" height="60">
+              <img :src="findUserIcon(selectUser)" width="60" height="60">
             </div>
             <div style="float:right;width: 80px;">
               <div>{{selectUser.name||selectUser.username}}</div>
@@ -117,14 +117,20 @@
   </div>
 </template>
 <script type="text/ecmascript-6">
-import { getUserList } from "../../api/api";
+import { getUserList,addBetUser } from "../../api/api";
 import moment from "moment";
 export default {
   data() {
     return {
       users: [],
       total: 0,
-      selectUser: null,
+      selectUser: {
+        name: '',
+        id: '',
+        phone:'',
+        channel: '',
+        balance: 0,
+      },
       pageSize: 20,
       publishOrder: true,
       currengPage: 1,
@@ -138,7 +144,34 @@ export default {
     }
   },
   methods: {
-    findUserIcon: function(url) {
+    addBetUser: function(){
+      //添加具体关联用户信息；
+      let self = this;
+      let searchAttr = self.searchAttr;
+      if(!searchAttr){
+        self.$message.error('手机号不允许为空，请输入手机号');
+        return;
+      }
+      var params = {
+        telphone: self.searchAttr
+      };
+      addBetUser(params).then(data => {
+        let error_code = data.error_code;
+        if(error_code == 1){
+          self.$message.error(data.msg);
+          return;
+        }
+        self.$message.info("添加成功。");
+        self.doQuery();
+      });
+
+    },
+
+    findUserIcon: function(user) {
+      if(!user){
+        return "/static/images/user_def.jpeg";
+      }
+      let url = user.usericonURL;
       return url || "/static/images/user_def.jpeg";
     },
     findUserClass: function(user) {
@@ -149,6 +182,9 @@ export default {
       return className;
     },
     findRegisterDate: function(date) {
+      if(!date){
+        return "";
+      }
       return moment(date).format("YYYY-MM-DD H:mm:ss");
     },
     doSelectUser(user) {
@@ -174,6 +210,7 @@ export default {
         let content = data.data;
         self.total = content.total;
         self.users = content.list;
+
         if (self.users.length > 0) {
           self.selectUser = self.users[0];
         }
