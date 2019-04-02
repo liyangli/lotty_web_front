@@ -6,6 +6,7 @@ export const requestLogin = params => { return axios.post(`${base}/login`, param
 export const requestRegister = params => { return axios.post(`${base}/register`, params).then(res => res.data); };
 
 export const getUserList = params => { return axios.post(`${base}/betUser/search`, params).then(res => res.data); };
+export const addBetUser = params => { return axios.post(`${base}/betUser/add`, params).then(res => res.data); };
 
 export const findOrders = params => { return axios.post(`${base}/order/search`, params).then(res => res.data); };
 
