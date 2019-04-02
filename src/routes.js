@@ -10,6 +10,7 @@ import order from './views/nav2/order.vue'
 import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
+import orderDetail from './views/nav2/order_detail.vue'
 
 let routes = [
     {
@@ -43,6 +44,7 @@ let routes = [
         iconCls: 'fa fa-id-card-o',
         children: [
             { path: '/order', component: order, name: '普通订单' },
+            { path: '/orderDetail', component: orderDetail, name: '订单详情',hidden: true  },
         ]
     },
     {

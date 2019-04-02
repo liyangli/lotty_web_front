@@ -35,13 +35,83 @@
                 </label>
             </div>
         </div>
-        <div>
+        <div v-if="type==1">
             <el-table
                     :data="tableData"
-                    stripe
                     style="width: 100%">
                 <el-table-column
-                        prop="date"
+                        prop="buyuserno"
+                        label="操作"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="截止时间/等待时间/金额/注数"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="彩种类型">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="用户名">
+                </el-table-column>
+                <el-table-column
+                        label="订单编号">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.id }}</span>
+                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail"></i>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <div v-if="type==2">
+            <el-table
+                    :data="tableData"
+                    style="width: 100%">
+                <el-table-column
+                        prop="buyuserno"
+                        label="操作"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="投注金额"
+                        width="180">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="中奖金额">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="出票时间">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="彩种">
+                </el-table-column>
+                <el-table-column
+                        prop="buyuserno"
+                        label="用户名">
+                </el-table-column>
+                <el-table-column
+                        label="订单编号">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.id }}</span>
+                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail"></i>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+
+        <div v-if="type==3" >
+            <el-table
+                    :data=tableData
+                    style="width: 100%">
+                <el-table-column
+                        prop="buyuserno"
                         label="撤单类型"
                         width="180">
                 </el-table-column>
@@ -51,26 +121,40 @@
                         width="180">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
+                        prop="buyuserno"
                         label="投注时间">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
+                        prop="buyuserno"
                         label="金额/注数">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
+                        prop="buyuserno"
                         label="彩种">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
+                        prop="buyuserno"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
-                        prop="address"
                         label="订单编号">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.id }}</span>
+                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail"></i>
+                    </template>
                 </el-table-column>
             </el-table>
+        </div>
+
+        <div class="block">
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page.sync=currentPage
+                    :page-size="20"
+                    layout="total, prev, pager, next"
+                    :total=total>
+            </el-pagination>
         </div>
     </div>
 </template>
@@ -80,21 +164,26 @@
         props: ['type'],
         data(){
             return {
-                orderType: '1',
-                type_jc: '',
                 types: [],
                 secondTypes: [],
                 first_type_checked: true,
                 second_type_checked: true,
                 tableData: [],
+                total:0,
+                currentPage:1,
                 pageSize: 20,
                 pageNo: 1
             }
         },
-        methods:{
-            handleClick(tab, event) {
-                console.log(tab, event);
+        watch: {
+            second_type_checked:function () {
+                console.info("second_type_checked change")
             },
+            first_type_checked:function () {
+                console.info("first_type_checked changed")
+            }
+        },
+        methods:{
             opearAllClick(){
                 this.first_type_checked = !this.first_type_checked;
                 for(let type of this.types){
@@ -103,7 +192,8 @@
                 if(!this.first_type_checked){
                     this.types[0].checked = true;
                 }
-
+                //调用查询方法
+                //this.doQuery();
             },
             opearClick(type){
                 this.first_type_checked = false;
@@ -129,11 +219,32 @@
 
                     }
                 }
+                //调用查询方法
+                //this.doQuery();
             },
-
-            /**
-             * 初始化默认类型
-             */
+            opearSecondAllClick(){
+                this.second_type_checked = !this.second_type_checked;
+                for(let type of this.secondTypes){
+                    type.checked=this.second_type_checked;
+                }
+                if(!this.second_type_checked){
+                    this.secondTypes[0].checked = true;
+                }
+                //调用查询方法
+                //this.doQuery();
+            },
+            opearSecondClick(type){
+                this.second_type_checked = false;
+                type.checked = !type.checked;
+                //调用查询方法
+                //this.doQuery();
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+            },
             makeTypes(){
                 this.types = [{
                     id: 1,
@@ -200,20 +311,29 @@
                     }]
                 }]
             },
-            doQuery(){
+            doQuery(type){
                 //查询所有订单数据
+                /**
+                 * 需要增加一个彩种的查询，暂时不知道彩种的字段，所以先不处理
+                 * @type {methods.doQuery}
+                 */
                 let self = this;
-                findOrders({flag: type,pageSize: self.pageSize,pageNo: self.pageNo}).then((reslut)=>{
-                    self.tableData = result.data;
+                findOrders({flag: type,pageSize: self.pageSize,pageNo: self.pageNo}).then((result)=>{
+                    self.tableData = result.data.list;
+                    self.total = result.data.total;
                 });
+            },
+            orderDetail(){
+                //跳转到订单详情页
+                let self = this;
+                let params = {type:self.type}
+                self.$router.push({ path: "/orderDetail", params: params })
             }
         },
         mounted(){
             this.makeTypes();
             //根据类型分别获取具体数据；
-
             console.info("type:"+this.type);
-            console.info("$$$$$$$$$$$$$$$$");
         }
     }
 </script>
