@@ -1,27 +1,16 @@
 <template>
 	<div style="height: 100%;width:100%;">
-		<el-tabs v-model="orderType" type="card" @tab-click="handleClick">
-			<el-tab-pane label="未出票" name="1">
-				<order-list type="1"></order-list>
+		<el-tabs v-model="orderType"  @tab-click="handleClick">
+			<el-tab-pane label="未出票" name="1" >
+				<order-list type="1" ref="orderList1"></order-list>
 			</el-tab-pane>
-			<el-tab-pane label="已出票" name="2">
-				<order-list type="2"></order-list>
-
+			<el-tab-pane label="已出票" name="2" >
+				<order-list type="2" ref="orderList2"></order-list>
 			</el-tab-pane>
-			<el-tab-pane label="已撤单" name="3">
-				<order-list type="3"></order-list>
+			<el-tab-pane label="已撤单" name="3" >
+				<order-list type="3" ref="orderList3"></order-list>
 			</el-tab-pane>
 		</el-tabs>
-		<div class="block">
-			<el-pagination
-					@size-change="handleSizeChange"
-					@current-change="handleCurrentChange"
-					:current-page.sync="currentPage1"
-					:page-size="20"
-					layout="total, prev, pager, next"
-					:total="5">
-			</el-pagination>
-		</div>
 	</div>
 
 </template>
@@ -32,155 +21,29 @@
 	export default {
 		data() {
 			return {
-				orderType: '1',
-				type_jc: '',
-				types: [],
-				secondTypes: [],
-				first_type_checked: true,
-				tableData: [{
-					date: '2016-05-02',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1518 弄'
-				}, {
-					date: '2016-05-04',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1517 弄'
-				}, {
-					date: '2016-05-01',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1519 弄'
-				}, {
-					date: '2016-05-03',
-					name: '王小虎',
-					address: '上海市普陀区金沙江路 1516 弄'
-				}],
-				currentPage1: 5
-
+				orderType: "1",
 			}
 		},
 		components: {
 			orderList
 		},
 		methods: {
-
 			handleClick(tab, event) {
-				console.log(tab, event);
-			},
-			opearAllClick(){
-				this.first_type_checked = !this.first_type_checked;
-				for(let type of this.types){
-					type.checked=this.first_type_checked;
-				}
-				if(!this.first_type_checked){
-					this.types[0].checked = true;
-				}
-
-			},
-			opearClick(type){
-				this.first_type_checked = false;
-				type.checked = !type.checked;
-				let types = type.subTypes;
-				if(type.checked){
-					for(let subType of types){
-						subType.checked = true;
-						this.secondTypes.push(subType);
-					}
-				}else{
-					//进行移除secondTypes中对应数据
-					let len = this.secondTypes.length;
-					console.info("len:"+len);
-					for(let i=len-1;i>=0;i--){
-						for(let subType of types){
-							if(this.secondTypes[i].id == subType.id){
-								subType.checked = false;
-								this.secondTypes.splice(i,1);
-								break;
-							}
-						}
-
+				//调用对应子组件查找方法
+				for(let each in this.$refs){
+					if(each.indexOf(tab.name)!= -1){
+						this.$refs[each].doQuery(tab.name);
+						break;
 					}
 				}
 			},
-
-			/**
-			 * 初始化默认类型
-			 */
-			makeTypes(){
-				this.types = [{
-					id: 1,
-					name: '竞彩',
-					checked: false,
-					subTypes: [{
-						id: 11,
-						name: '竞彩足球',
-						checked: false
-					},{
-						id: 12,
-						name: '竞彩篮球',
-						checked: false
-					},{
-						id: 13,
-						name: '胜负彩',
-						checked: false
-					}]
-				},{
-					id: 2,
-					name:"数字彩",
-					checked: false,
-					subTypes: [{
-						id: 22,
-						name: '任选九',
-						checked: false,
-					},{
-						id: 22,
-						name: '大乐透',
-						checked: false,
-					},{
-						id: 22,
-						name: '双色球',
-						checked: false,
-					},{
-						id: 22,
-						name: '福彩3D',
-						checked: false,
-					},{
-						id: 22,
-						name: '排列3',
-						checked: false,
-					},{
-						id: 22,
-						name: '排列五',
-						checked: false
-					}]
-				},{
-					id: 3,
-					name: '高频彩',
-					checked: false,
-					subTypes:[{
-						id: 31,
-						name: '山东11选5',
-						checked: false
-					},{
-						id: 32,
-						name: '广东11选5',
-						checked: false
-					},{
-						id: 33,
-						name: '吉林快三',
-						checked: false
-					}]
-				}]
-			},
-			handleSizeChange(val) {
-				console.log(`每页 ${val} 条`);
-			},
-			handleCurrentChange(val) {
-				console.log(`当前页: ${val}`);
-			}
 		},
 		mounted() {
-			this.makeTypes();
-			//获取所有的订单数据；
+
+		},
+		created(){
+			let self = this;
+
 		}
 	};
 
