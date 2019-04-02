@@ -11,6 +11,7 @@ import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
 import orderDetail from './views/nav2/order_detail.vue'
+import userStatistic from './views/nav3/userStatistic.vue'
 
 let routes = [
     {
@@ -53,7 +54,7 @@ let routes = [
         name: '数据统计',
         iconCls: 'fa fa-id-card-o',
         children: [
-            { path: '/page6', component: Page6, name: '用户数据' },
+            { path: '/userStatistic', component: userStatistic, name: '用户数据' },
             { path: '/page7', component: Page6, name: '出票数据' },
             { path: '/page8', component: Page6, name: '派奖数据' },
             { path: '/page9', component: Page6, name: '取票数据' }
