@@ -10,36 +10,35 @@
                 <span class="title">订单详情</span>
             </div>
             <div class="text item">
-                <span class="orderInfo">用户名：1586982500</span>
-                <span class="orderInfo">订单编号：1586982500</span>
-                <span class="orderInfo">金额：1586982500</span>
-                <span class="orderInfo">已出票</span>
+                <span class="orderInfo">用户名：{{detail.buyuserno}}</span>
+                <span class="orderInfo">订单编号：{{detail.id}}</span>
+                <span class="orderInfo">金额：{{detail.amt}}</span>
+                <span class="orderInfo">{{detail.orderstate}}</span>
             </div>
             <div>
                 <el-card class="box-card" shadow="never" >
                     <div slot="header" class="clearfix">
-                        <span class="title subTitle">竞彩篮球</span>
-                        <span class="title subTitle">混合</span>
-                        <span class="title subTitle">2场</span>
-                        <span class="title subTitle">2串1</span>
+                        <span class="title subTitle">{{detail.lotnoName}}</span>
+                        <span class="title subTitle">{{detail.teamCnt}}场</span>
+                        <span class="title subTitle">{{detail.subDesc?detail.subDesc+"串1":""}}</span>
                     </div>
                     <el-table
                             :data="tableData"
                             style="width: 100%">
                         <el-table-column
-                                prop="date"
+                                prop="week"
                                 label="场次">
                         </el-table-column>
                         <el-table-column
-                                prop="date"
+                                prop="enddate"
                                 label="截止时间">
                         </el-table-column>
                         <el-table-column
                                 label="对阵">
                             <template slot-scope="scope">
-                                <span class="subTitle">魔术（客）</span>
-                                <span class="subTitle">VS（219.5）</span>
-                                <span class="subTitle">掘金（主）</span>
+                                <span class="subTitle">{{scope.row.team[0]}}</span>
+                                <span class="subTitle">VS{{scope.row.peilvs.peilv?'('+scope.row.peilvs.peilv+')':""}}</span>
+                                <span class="subTitle">{{scope.row.team[1]}}</span>
                             </template>
                         </el-table-column>
                         <el-table-column label="投注项">
@@ -52,8 +51,8 @@
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="date"
-                                label="场次">
+                                prop="result"
+                                label="彩果">
                         </el-table-column>
                     </el-table>
                 </el-card>
@@ -68,6 +67,7 @@
         props: ['type'],
         data() {
             return {
+                detail:null,
                 tableData: [{
                     date: '2016-05-02',
                     name: '王小虎',
@@ -97,9 +97,34 @@
         },
         mounted() {
 
+
         },
         created(){
             let self = this;
+            let detail = self.$route.params.detail;
+            let type = self.$route.params.type;
+            let week = {"1":"周一","2":"周二","3":"周三","4":"周四","5":"周五","6":"周六","7":"周日"};
+            console.info(detail)
+            if(type == 3){
+                //撤单类型
+                if(detail.orderInfo){
+                    let info = detail.orderInfo.split("@")[0]
+                    detail.subDesc =  info.substr(info.length -1,info.length)
+                }
+                detail.teamCnt = detail.jingcaiResults.length;
+                let jingcai = JSON.parse(detail.jingcaiResults);
+                for(let each of jingcai) {
+                    each.team = each.team.split(":");
+                    each.week = week[parseInt(each.week)]+each.teamId;
+                }
+
+                detail.teamCnt = jingcai.length;
+                self.tableData = jingcai;
+
+
+            }
+
+            self.detail = detail;
 
         }
     };

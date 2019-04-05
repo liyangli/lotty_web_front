@@ -9,6 +9,7 @@ export const getUserList = params => { return axios.post(`${base}/betUser/search
 export const addBetUser = params => { return axios.post(`${base}/betUser/add`, params).then(res => res.data); };
 
 export const findOrders = params => { return axios.post(`${base}/order/search`, params).then(res => res.data); };
+export const findTypes = params => { return axios.get(`${base}/order/findType`,{ params: params }).then(res => res.data); };
 
 export const getUserListPage = params => { return axios.get(`${base}/user/listpage`, params); };
 

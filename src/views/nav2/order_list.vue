@@ -61,7 +61,7 @@
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
-                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail"></i>
+                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail(scope.row)"></i>
                     </template>
                 </el-table-column>
             </el-table>
@@ -100,7 +100,7 @@
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
-                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail"></i>
+                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail(scope.row)"></i>
                     </template>
                 </el-table-column>
             </el-table>
@@ -116,20 +116,20 @@
                         width="180">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="canceltime"
                         label="撤单时间"
                         width="180">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        prop="createtime"
                         label="投注时间">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        prop="amt"
                         label="金额/注数">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        prop="lotnoName"
                         label="彩种">
                 </el-table-column>
                 <el-table-column
@@ -140,7 +140,7 @@
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
-                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail"></i>
+                        <i class="el-icon-search" style="color:deepskyblue" @click="orderDetail(scope.row)"></i>
                     </template>
                 </el-table-column>
             </el-table>
@@ -160,6 +160,7 @@
 </template>
 <script type="text/ecmascript-6">
     import { findOrders } from '../../api/api';
+    import {findTypes} from '../../api/api';
     export default {
         props: ['type'],
         data(){
@@ -175,14 +176,6 @@
                 pageNo: 1
             }
         },
-        watch: {
-            second_type_checked:function () {
-                console.info("second_type_checked change")
-            },
-            first_type_checked:function () {
-                console.info("first_type_checked changed")
-            }
-        },
         methods:{
             opearAllClick(){
                 this.first_type_checked = !this.first_type_checked;
@@ -192,8 +185,7 @@
                 if(!this.first_type_checked){
                     this.types[0].checked = true;
                 }
-                //调用查询方法
-                //this.doQuery();
+                this.doQuery();
             },
             opearClick(type){
                 this.first_type_checked = false;
@@ -207,7 +199,6 @@
                 }else{
                     //进行移除secondTypes中对应数据
                     let len = this.secondTypes.length;
-                    console.info("len:"+len);
                     for(let i=len-1;i>=0;i--){
                         for(let subType of types){
                             if(this.secondTypes[i].id == subType.id){
@@ -219,8 +210,7 @@
 
                     }
                 }
-                //调用查询方法
-                //this.doQuery();
+                this.doQuery();
             },
             opearSecondAllClick(){
                 this.second_type_checked = !this.second_type_checked;
@@ -230,14 +220,12 @@
                 if(!this.second_type_checked){
                     this.secondTypes[0].checked = true;
                 }
-                //调用查询方法
-                //this.doQuery();
+                this.doQuery();
             },
             opearSecondClick(type){
                 this.second_type_checked = false;
                 type.checked = !type.checked;
-                //调用查询方法
-                //this.doQuery();
+                this.doQuery();
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -245,93 +233,107 @@
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
             },
-            makeTypes(){
-                this.types = [{
-                    id: 1,
-                    name: '竞彩',
-                    checked: false,
-                    subTypes: [{
-                        id: 11,
-                        name: '竞彩足球',
-                        checked: false
-                    },{
-                        id: 12,
-                        name: '竞彩篮球',
-                        checked: false
-                    },{
-                        id: 13,
-                        name: '胜负彩',
-                        checked: false
-                    }]
-                },{
-                    id: 2,
-                    name:"数字彩",
-                    checked: false,
-                    subTypes: [{
-                        id: 22,
-                        name: '任选九',
-                        checked: false,
-                    },{
-                        id: 22,
-                        name: '大乐透',
-                        checked: false,
-                    },{
-                        id: 22,
-                        name: '双色球',
-                        checked: false,
-                    },{
-                        id: 22,
-                        name: '福彩3D',
-                        checked: false,
-                    },{
-                        id: 22,
-                        name: '排列3',
-                        checked: false,
-                    },{
-                        id: 22,
-                        name: '排列五',
-                        checked: false
-                    }]
-                },{
-                    id: 3,
-                    name: '高频彩',
-                    checked: false,
-                    subTypes:[{
-                        id: 31,
-                        name: '山东11选5',
-                        checked: false
-                    },{
-                        id: 32,
-                        name: '广东11选5',
-                        checked: false
-                    },{
-                        id: 33,
-                        name: '吉林快三',
-                        checked: false
-                    }]
-                }]
+            makeData(data) {
+                var pos = {};
+                var tree = [];
+                var i = 0;
+                while (data.length != 0) {
+                    if (data[i].pid == null) {
+                        tree.push({
+                            id: data[i].id,
+                            name: data[i].name,
+                            checked:false
+                        });
+                        pos[data[i].id] = [tree.length - 1];
+                        data.splice(i, 1);
+                        i--;
+                    }else {
+                        var posArr = pos[data[i].pid];
+                        if (posArr != undefined) {
+
+                            var obj = tree[posArr[0]];
+                            for (var j = 1; j < posArr.length; j++) {
+                                obj = obj.subTypes[posArr[j]];
+                            }
+
+                            if (!obj.subTypes) {
+                                obj.subTypes = [];
+                            }
+                            obj.subTypes.push({
+                                id: data[i].id,
+                                name: data[i].name,
+                                pid: data[i].pid,
+                                checked: false
+                            });
+                            pos[data[i].id] = posArr.concat([obj.subTypes.length - 1]);
+                            data.splice(i, 1);
+                            i--;
+                        }
+                        i++;
+                        if (i > data.length - 1) {
+                            i = 0;
+                        }
+                    }
+                }
+                return tree;
+            },
+            findTypes(){
+                let self = this;
+                findTypes().then((result)=>{
+                    self.types = self.makeData(result.data);
+                });
+            },
+            getTypeName(typeID){
+                let self = this;
+                for(let each of self.types){
+                    for(let lotno of each.subTypes){
+                        if(lotno.id == typeID){
+                            return each.name+" "+lotno.name;
+                        }
+                    }
+                }
             },
             doQuery(type){
-                //查询所有订单数据
-                /**
-                 * 需要增加一个彩种的查询，暂时不知道彩种的字段，所以先不处理
-                 * @type {methods.doQuery}
-                 */
+                //查询订单数据
                 let self = this;
-                findOrders({flag: type,pageSize: self.pageSize,pageNo: self.pageNo}).then((result)=>{
-                    self.tableData = result.data.list;
+                let params = {
+                    flag: type,
+                    pageSize: self.pageSize,
+                    pageNo: self.pageNo
+                }
+                let lotnoIDs = "";
+                for(let each of self.types){
+                    if(each.checked){
+                        for(let lotno of each.subTypes){
+                            if(lotno.checked){
+                                lotnoIDs += lotno.id+",";
+                            }
+                        }
+                    }
+                }
+                if(lotnoIDs != ""){
+                    params.lotno = lotnoIDs.substr(0,lotnoIDs.length - 2);
+                }
+
+                findOrders(params).then((result)=>{
+                    let list = result.data.list;
+                    for(let each of list){
+                        each.lotnoName = this.getTypeName(each.lotno);
+                    }
+                    self.tableData = list;
                     self.total = result.data.total;
                 });
             },
-            orderDetail(){
+            orderDetail(orderInfo){
                 //跳转到订单详情页
                 let self = this;
-                let params = {type:self.type}
-                self.$router.push({ path: "/orderDetail", params: params })
+                let params = {type:self.type,detail:orderInfo}
+//                self.$router.push({ path: "/orderDetail", params: params })
+                self.$router.push({ name: "订单详情", params: params })
             }
         },
         mounted(){
-            this.makeTypes();
+            this.findTypes();
             //根据类型分别获取具体数据；
             console.info("type:"+this.type);
         }
