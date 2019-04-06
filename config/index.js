@@ -39,6 +39,12 @@ module.exports = {
       },
       "/order/*": {
         target: url
+      },
+      "/statistics/*": {
+        target: url
+      },
+      "/lotno/*": {
+        target: url
       }
 
 
