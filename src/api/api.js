@@ -20,3 +20,7 @@ export const batchRemoveUser = params => { return axios.get(`${base}/user/batchr
 export const editUser = params => { return axios.get(`${base}/user/edit`, { params: params }); };
 
 export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };
+
+//获取注册用户统计数据
+export const findUserStatistics = params => { return axios.get(`${base}/statistics/findUserTotalDataMutation`, { params: params }); };
+export const doQueryStatistics = (type,params) => { return axios.post(`${base}/`+type+"/statistics", params); };
