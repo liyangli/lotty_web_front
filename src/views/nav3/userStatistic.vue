@@ -43,9 +43,12 @@
 
                         </el-tabs>
                         <div v-if="activeName == 'betUser'" class="content-statistics">
-                            <span >投注金额(元)</span><span class="">{{betUserStatistics.amtCnt/100}}</span> &nbsp;&nbsp;
-                            <span>中奖金额(元)</span>
-                            <span>{{betUserStatistics.orderaftprizeamtCnt/100}}</span>
+                            <span >投注金额(元) </span><span class="amount">{{betUserStatistics.amtCnt/100}}</span> &nbsp;&nbsp;
+                            <span>中奖金额(元) </span>
+                            <span class="amount">{{betUserStatistics.orderaftprizeamtCnt/100}}</span>
+                        </div>
+                        <div v-if="activeName == 'lotno'" class="content-statistics">
+                            <span >投注金额(元) </span><span class="amount">{{lotnoStatistics.amtCnt/100}}</span>
                         </div>
                         <div class="search-statistics">
                             <span style="float: right">
@@ -67,43 +70,53 @@
                                     :data="betUserStatistics.list"
                                     style="width: 100%">
                                 <el-table-column
+                                        align="center"
                                         prop="username"
                                         label="用户名">
                                 </el-table-column>
                                 <el-table-column
                                         prop="amt"
-                                        label="投注金额"
-                                        width="180">
+                                        align="center"
+                                        label="投注金额">
                                 </el-table-column>
                                 <el-table-column
                                         prop="orderaftprizeamt"
-                                        label="中奖金额"
-                                        width="180">
+                                        align="center"
+                                        label="中奖金额">
                                 </el-table-column>
                             </el-table>
                         </div>
                         <div v-if="activeName=='lotno'">
                             <el-table
-                                    :data="lotnos"
+                                    :data="lotnoStatistics.list"
                                     style="width: 100%">
                                 <el-table-column
-                                        prop="date"
-                                        label="日期"
-                                        width="180">
+                                        prop="lotnoName"
+                                        align="center"
+                                        label="彩种类型">
                                 </el-table-column>
                                 <el-table-column
-                                        prop="name"
-                                        label="姓名"
-                                        width="180">
+                                        prop="amt"
+                                        align="center"
+                                        label="投注金额">
                                 </el-table-column>
                                 <el-table-column
-                                        prop="address"
-                                        label="地址">
+                                        prop="time"
+                                        align="center"
+                                        label="统计时间">
                                 </el-table-column>
                             </el-table>
                         </div>
                     </div>
-
+                    <div class="block">
+                        <el-pagination
+                                @current-change="handleCurrentChange"
+                                :current-page.sync=curPage
+                                :page-size=pageSize
+                                layout="total, prev, pager, next"
+                                :total=total>
+                        </el-pagination>
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
@@ -115,12 +128,14 @@
 <script type="text/ecmascript-6">
     import moment from 'moment';
     import { findUserStatistics,doQueryStatistics } from '../../api/api';
+    import {findTypes} from '../../api/api';
     export default {
         data() {
             return {
                 activeName: "betUser",
                 curPage: 1,
                 pageSize:10,
+                total:0,
                 userStatistics: {
                     "monthNum": 0,
                     "todayNum": 0,
@@ -133,9 +148,12 @@
                     orderaftprizeamtCnt: 0.0,
                     list: []
                 },
+                lotnoStatistics:{
+                    amtCnt: 0.0,
+                    list: []
+                },
                 date:moment().add(-1,"days"),
-                betUsers: [],
-                lotnos: []
+                types:[]
 
             }
         },
@@ -150,15 +168,98 @@
           }
         },
         methods: {
-
+            handleCurrentChange(val){
+                this.curPage = val;
+                this.doQueryStatistics();
+            },
             handleClick(){
                 //菜单点击事件
                 console.info("activeName:"+this.activeName);
-//                this.doQueryStatistics();
+                this.total = 0;
+                if(this.curPage == 1){
+                    this.doQueryStatistics();
+                }else{
+                    this.curPage = 1;
+                }
             },
             init(){
                 //初始化基础数据
-                console.info(this.date);
+                this.findTypes();
+            },
+            makeData(data) {
+                var pos = {};
+                var tree = [];
+                var i = 0;
+                while (data.length != 0) {
+                    if (data[i].pid == null) {
+                        tree.push({
+                            id: data[i].id,
+                            name: data[i].name,
+                            checked:false
+                        });
+                        pos[data[i].id] = [tree.length - 1];
+                        data.splice(i, 1);
+                        i--;
+                    }else {
+                        var posArr = pos[data[i].pid];
+                        if (posArr != undefined) {
+
+                            var obj = tree[posArr[0]];
+                            for (var j = 1; j < posArr.length; j++) {
+                                obj = obj.subTypes[posArr[j]];
+                            }
+
+                            if (!obj.subTypes) {
+                                obj.subTypes = [];
+                            }
+                            obj.subTypes.push({
+                                id: data[i].id,
+                                name: data[i].name,
+                                pid: data[i].pid,
+                                checked: false
+                            });
+                            pos[data[i].id] = posArr.concat([obj.subTypes.length - 1]);
+                            data.splice(i, 1);
+                            i--;
+                        }
+                        i++;
+                        if (i > data.length - 1) {
+                            i = 0;
+                        }
+                    }
+                }
+                return tree;
+            },
+            findTypes(){
+                let self = this;
+                findTypes().then((result)=>{
+                    self.types = self.makeData(result.data);
+                });
+            },
+            getTypeName(typeID){
+                let self = this;
+                let name = "";
+                let pid = null;
+                for(let each of self.types){
+                    for(let lotno of each.subTypes){
+                        if(lotno.id == typeID){
+                            pid = each.id;
+                            name = each.name+" "+lotno.name;
+                            break
+                        }
+                        if(lotno.subTypes){
+                            for(let third of lotno.subTypes){
+                                if(third.id == typeID){
+                                    pid = each.id;
+                                    name = each.name+" "+lotno.name+" "+third.name;
+                                    break
+                                }
+                            }
+                        }
+
+                    }
+                }
+                return name;
             },
             //初始化查询左侧统计数据
             doQuery(){
@@ -185,13 +286,16 @@
                     pageSize: self.pageSize
                 };
                 doQueryStatistics(self.activeName,param).then((result)=>{
-                    let data = result.data;
-                    let error_code = data.error_code;
+                    let res = result.data;
+
+                    let error_code = res.error_code;
                     if(error_code != 0){
-                        self.$message.error(data.msg);
+                        self.$message.error(res.msg);
                         return;
                     }
-                    let obj = data.data;
+                    let obj = res.data;
+
+                    self.total =  obj.total;
                     if(self.activeName == "betUser"){
                         //进行循环遍历，计算投注、中奖金额
                         let list = obj.list;
@@ -201,7 +305,13 @@
                         }
                         self.betUserStatistics = obj;
                     }else if (self.activeName == "lotno"){
-
+                        let list = obj.list;
+                        for(let lotnoObj of list){
+                            lotnoObj.amt = lotnoObj.amt/100;
+                            lotnoObj.lotnoName = self.getTypeName(lotnoObj.lotno);
+                            lotnoObj.time = moment(lotnoObj.time).format("YYYY-MM-DD HH:mm:ss");
+                        }
+                        self.lotnoStatistics = obj;
                     }
 
                 });
@@ -228,7 +338,7 @@
 
 </script>
 
-<style>
+<style scoped>
     .blue{
         background: #8183fe;
     }
@@ -290,6 +400,10 @@
 
     .search-statistics{
         float: right;
+    }
+    .amount{
+        font-size: 16px;
+        font-weight:500;
     }
 
 </style>
