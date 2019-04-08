@@ -8,7 +8,7 @@
                     </div>
 
                     <div class="tabOne blue">
-                        <div class="tabTitle">今日出票</div>
+                        <div class="tabTitle">今日取票</div>
                         <div class="circle top"></div>
                         <div class="circle bottom"></div>
                         <div class="tabContent">
@@ -17,21 +17,21 @@
                         </div>
                     </div>
                     <div class="tabOne orange">
-                        <div class="tabTitle">本周出票</div>
+                        <div class="tabTitle">本周取票</div>
                         <div class="circle top"></div>
                         <div class="circle bottom"></div>
                         <div class="tabContent">
-                           <span class="contentBox"> <span class="content">0</span>单</span>
-                           <span class="contentBox"> <span class="content">0.00</span>元</span>
+                            <span class="contentBox"> <span class="content">0</span>单</span>
+                            <span class="contentBox"> <span class="content">0.00</span>元</span>
                         </div>
                     </div>
                     <div class="tabOne green">
-                        <div class="tabTitle">本月出票</div>
+                        <div class="tabTitle">本月取票</div>
                         <div class="circle top"></div>
                         <div class="circle bottom"></div>
                         <div class="tabContent">
-                           <span class="contentBox"> <span class="content">0</span>单</span>
-                          <span class="contentBox">  <span class="content">0.00</span>元</span>
+                            <span class="contentBox"> <span class="content">0</span>单</span>
+                            <span class="contentBox">  <span class="content">0.00</span>元</span>
                         </div>
                     </div>
 
@@ -63,11 +63,11 @@
                             </el-table-column>
                             <el-table-column
                                     prop="name"
-                                    label="投注金额">
+                                    label="取票金额">
                             </el-table-column>
                             <el-table-column
                                     prop="address"
-                                    label="出票时间">
+                                    label="取票时间">
                             </el-table-column>
                         </el-table>
                     </template>
@@ -110,7 +110,7 @@
             },
             //初始化查询左侧统计数据
             doQuery(){
-
+                let self = this;
             }
         },
         mounted() {

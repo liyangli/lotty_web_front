@@ -32,7 +32,7 @@
 				//调用对应子组件查找方法
 				for(let each in this.$refs){
 					if(each.indexOf(tab.name)!= -1){
-						this.$refs[each].doQuery(tab.name);
+						this.$refs[each].doQuery({'type':tab.name});
 						break;
 					}
 				}

@@ -39,18 +39,18 @@
             <el-table
                     :data="tableData"
                     style="width: 100%">
+                <!--<el-table-column-->
+                        <!--prop="buyuserno"-->
+                        <!--label="操作"-->
+                        <!--width="180">-->
+                <!--</el-table-column>-->
                 <el-table-column
-                        prop="buyuserno"
-                        label="操作"
-                        width="180">
-                </el-table-column>
-                <el-table-column
-                        prop="buyuserno"
+                        prop="cancelTime"
                         label="截止时间/等待时间/金额/注数"
                         width="180">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        prop="lotnoName"
                         label="彩种类型">
                 </el-table-column>
                 <el-table-column
@@ -70,33 +70,38 @@
             <el-table
                     :data="tableData"
                     style="width: 100%">
+                <!--<el-table-column-->
+                        <!--label="操作"-->
+                        <!--width="180">-->
+                <!--</el-table-column>-->
                 <el-table-column
-                        prop="buyuserno"
-                        label="操作"
-                        width="180">
-                </el-table-column>
-                <el-table-column
-                        prop="buyuserno"
+                        prop="amt"
+                        align="center"
                         label="投注金额"
-                        width="180">
+                        width="120">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        align="center"
+                        prop="0"
                         label="中奖金额">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        align="center"
+                        prop="createtime"
                         label="出票时间">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        align="center"
+                        prop="lotnoName"
                         label="彩种">
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         prop="buyuserno"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -150,8 +155,8 @@
             <el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
-                    :current-page.sync=currentPage
-                    :page-size="20"
+                    :current-page.sync=pageNo
+                    :page-size=pageSize
                     layout="total, prev, pager, next"
                     :total=total>
             </el-pagination>
@@ -171,10 +176,14 @@
                 second_type_checked: true,
                 tableData: [],
                 total:0,
-                currentPage:1,
                 pageSize: 20,
                 pageNo: 1
             }
+        },
+        watch:{
+          type:function () {
+              console.info("type chenge")
+          }
         },
         methods:{
             opearAllClick(){
@@ -232,6 +241,7 @@
             },
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
+                this.doQuery({'pageNo':val});
             },
             makeData(data) {
                 var pos = {};
@@ -285,21 +295,45 @@
             },
             getTypeName(typeID){
                 let self = this;
+                let name = "";
+                let pid = null;
                 for(let each of self.types){
                     for(let lotno of each.subTypes){
                         if(lotno.id == typeID){
-                            return each.name+" "+lotno.name;
+                            pid = each.id;
+                            name = each.name+" "+lotno.name;
+                            break
                         }
+                        if(lotno.subTypes){
+                            for(let third of lotno.subTypes){
+                                if(third.id == typeID){
+                                    pid = each.id;
+                                    name = each.name+" "+lotno.name+" "+third.name;
+                                    break
+                                }
+                            }
+                        }
+
                     }
                 }
+                return {"name":name,"pid":pid};
             },
-            doQuery(type){
+            doQuery(par){
                 //查询订单数据
                 let self = this;
                 let params = {
-                    flag: type,
                     pageSize: self.pageSize,
                     pageNo: self.pageNo
+                }
+                if (par.type){
+                    self.pageNo = 2;
+                    self.total = 0;
+                    params.flag =  par.type;
+                }else{
+                    params.flag =  self.type;
+                }
+                if(par.pageNo){
+                    params.pageNo = par.pageNo;
                 }
                 let lotnoIDs = "";
                 for(let each of self.types){
@@ -318,7 +352,9 @@
                 findOrders(params).then((result)=>{
                     let list = result.data.list;
                     for(let each of list){
-                        each.lotnoName = this.getTypeName(each.lotno);
+                        let info  = this.getTypeName(each.lotno);
+                        each.lotnoName = info.name;
+                        each.pid = info.pid;
                     }
                     self.tableData = list;
                     self.total = result.data.total;

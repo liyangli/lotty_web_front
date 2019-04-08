@@ -8,10 +8,13 @@ import userInfo from './views/nav1/userInfo.vue'
 import user from './views/nav1/user.vue'
 import order from './views/nav2/order.vue'
 import Page5 from './views/nav2/Page5.vue'
-import Page6 from './views/nav3/Page6.vue'
+import Page6 from './views/nav3/rewardStatistic.vue'
 import echarts from './views/charts/echarts.vue'
 import orderDetail from './views/nav2/order_detail.vue'
 import userStatistic from './views/nav3/userStatistic.vue'
+import orderStatistic from './views/nav3/orderStatistic.vue'
+import takeTicket from './views/nav3/takeTicket.vue'
+import rewardStatistic from './views/nav3/rewardStatistic.vue'
 
 let routes = [
     {
@@ -55,9 +58,9 @@ let routes = [
         iconCls: 'fa fa-id-card-o',
         children: [
             { path: '/userStatistic', component: userStatistic, name: '用户数据' },
-            { path: '/page7', component: Page6, name: '出票数据' },
-            { path: '/page8', component: Page6, name: '派奖数据' },
-            { path: '/page9', component: Page6, name: '取票数据' }
+            { path: '/orderStatistic', component: orderStatistic, name: '出票数据' },
+            { path: '/rewardStatistic', component: rewardStatistic, name: '派奖数据' },
+            { path: '/takeTicket', component: takeTicket, name: '取票数据' }
         ]
     },
     
