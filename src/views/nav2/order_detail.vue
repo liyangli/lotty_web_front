@@ -14,7 +14,7 @@
                 <span class="orderInfo" v-if="lotnoType=='SZC'">备注名：{{detail.buyuserno}}</span>
                 <span class="orderInfo">订单编号：{{detail.id}}</span>
                 <span class="orderInfo">金额：￥{{detail.amt}}[{{detail.lotmulti}}倍]</span>
-                <span class="orderInfo">{{detail.orderstate}}</span>
+                <span class="orderInfo">{{detail.orderstate==1?"未出票":detail.orderstate==2?"已出票":"已撤单"}}</span>
             </div>
             <div>
                 <el-card class="box-card" shadow="never" >
@@ -44,8 +44,8 @@
                                     align="center"
                                     label="对阵">
                                 <template slot-scope="scope">
-                                    <span class="subTitle">{{scope.row.team[0]}}</span>
-                                    <span class="subTitle">VS{{scope.row.peilvs[0].peilv?'('+scope.row.peilvs[0].peilv+')':""}}</span>
+                                    <span class="subTitle">{{scope.row.team[0]}}{{scope.row.letpoint?'('+scope.row.letpoint+')':""}}</span>
+                                    <span class="subTitle">VS</span>
                                     <span class="subTitle">{{scope.row.team[1]}}</span>
                                 </template>
                             </el-table-column>
@@ -128,6 +128,7 @@
                         "v0 v1":"平 主负",
                         "letVs_v0":"让负",
                         "letVs_v1":"让平",
+                        "letVs_v3":"让胜",
                         "g":"大",
                         "l":"小"
                         };

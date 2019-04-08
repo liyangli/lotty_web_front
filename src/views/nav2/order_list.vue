@@ -48,6 +48,9 @@
                         prop="cancelTime"
                         label="截止时间/等待时间/金额/注数"
                         width="180">
+                    <template slot-scope="scope">
+                        <span style="margin-left: 10px">{{ scope.row.cancelTime }}/{{scope.row.amt}}/{{scope.row.amt}}/{{scope.row.betnum}}</span>
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="lotnoName"
@@ -240,8 +243,7 @@
                 console.log(`每页 ${val} 条`);
             },
             handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
-                this.doQuery({'pageNo':val});
+                this.pageNo = val;
             },
             makeData(data) {
                 var pos = {};
@@ -322,18 +324,14 @@
                 //查询订单数据
                 let self = this;
                 let params = {
+                    flag:self.type,
                     pageSize: self.pageSize,
                     pageNo: self.pageNo
                 }
-                if (par.type){
+                if (par && par.type){
                     self.pageNo = 2;
                     self.total = 0;
                     params.flag =  par.type;
-                }else{
-                    params.flag =  self.type;
-                }
-                if(par.pageNo){
-                    params.pageNo = par.pageNo;
                 }
                 let lotnoIDs = "";
                 for(let each of self.types){
@@ -342,6 +340,7 @@
                             if(lotno.checked){
                                 lotnoIDs += lotno.id+",";
                             }
+
                         }
                     }
                 }
@@ -356,6 +355,7 @@
                         each.lotnoName = info.name;
                         each.pid = info.pid;
                     }
+                    console.info(result)
                     self.tableData = list;
                     self.total = result.data.total;
                 });
