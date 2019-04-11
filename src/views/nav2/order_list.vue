@@ -49,7 +49,7 @@
                         label="截止时间/等待时间/金额/注数"
                         width="180">
                     <template slot-scope="scope">
-                        <span style="margin-left: 10px">{{ scope.row.cancelTime }}/{{scope.row.amt}}/{{scope.row.amt}}/{{scope.row.betnum}}</span>
+                        <span style="margin-left: 10px">{{ scope.row.cancelTime |formatTime}}/{{scope.row.amt}}/{{scope.row.amt}}/{{scope.row.betnum}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -57,7 +57,7 @@
                         label="彩种类型">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        prop="userno"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
@@ -90,8 +90,8 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="createtime"
                         label="出票时间">
+                    <template slot-scope="scope">{{ scope.row.createtime | formatTime}}</template>
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -100,7 +100,7 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="buyuserno"
+                        prop="userno"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
@@ -124,13 +124,18 @@
                         width="180">
                 </el-table-column>
                 <el-table-column
-                        prop="canceltime"
                         label="撤单时间"
                         width="180">
+                    <template slot-scope="scope">
+                        {{ scope.row.canceltime | formatTime}}
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="createtime"
                         label="投注时间">
+                    <template slot-scope="scope">
+                        {{ scope.row.createtime | formatTime}}<
+                    </template>
                 </el-table-column>
                 <el-table-column
                         prop="amt"
@@ -141,7 +146,7 @@
                         label="彩种">
                 </el-table-column>
                 <el-table-column
-                        prop="buyuserno"
+                        prop="userno"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
@@ -156,7 +161,6 @@
 
         <div class="block">
             <el-pagination
-                    @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page.sync=pageNo
                     :page-size=pageSize
@@ -169,6 +173,7 @@
 <script type="text/ecmascript-6">
     import { findOrders } from '../../api/api';
     import {findTypes} from '../../api/api';
+    import moment from 'moment';
     export default {
         props: ['type'],
         data(){
@@ -181,6 +186,11 @@
                 total:0,
                 pageSize: 20,
                 pageNo: 1
+            }
+        },
+        filters:{
+            formatTime:function (time){
+                return moment(time).format("YYYY-MM-DD HH:mm:ss");
             }
         },
         watch:{
@@ -238,9 +248,6 @@
                 this.second_type_checked = false;
                 type.checked = !type.checked;
                 this.doQuery();
-            },
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
             },
             handleCurrentChange(val) {
                 this.pageNo = val;
@@ -303,14 +310,14 @@
                     for(let lotno of each.subTypes){
                         if(lotno.id == typeID){
                             pid = each.id;
-                            name = each.name+" "+lotno.name;
+                            name = lotno.name;
                             break
                         }
                         if(lotno.subTypes){
                             for(let third of lotno.subTypes){
                                 if(third.id == typeID){
                                     pid = each.id;
-                                    name = each.name+" "+lotno.name+" "+third.name;
+                                    name = lotno.name+" "+third.name;
                                     break
                                 }
                             }
@@ -336,16 +343,20 @@
                 let lotnoIDs = "";
                 for(let each of self.types){
                     if(each.checked){
-                        for(let lotno of each.subTypes){
-                            if(lotno.checked){
-                                lotnoIDs += lotno.id+",";
-                            }
+                        if(self.second_type_checked){
+                            lotnoIDs += each.id+",";
+                        }else{
+                            for(let lotno of each.subTypes){
+                                if(lotno.checked){
+                                    lotnoIDs += lotno.id+",";
+                                }
 
+                            }
                         }
                     }
                 }
                 if(lotnoIDs != ""){
-                    params.lotno = lotnoIDs.substr(0,lotnoIDs.length - 2);
+                    params.lotno = lotnoIDs.substr(0,lotnoIDs.length - 1);
                 }
 
                 findOrders(params).then((result)=>{
@@ -354,6 +365,7 @@
                         let info  = this.getTypeName(each.lotno);
                         each.lotnoName = info.name;
                         each.pid = info.pid;
+                        each.amt = each.amt/1000;
                     }
                     console.info(result)
                     self.tableData = list;
