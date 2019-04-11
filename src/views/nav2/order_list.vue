@@ -46,6 +46,7 @@
                 <!--</el-table-column>-->
                 <el-table-column
                         prop="cancelTime"
+                        align="center"
                         label="截止时间/等待时间/金额/注数"
                         width="180">
                     <template slot-scope="scope">
@@ -54,13 +55,16 @@
                 </el-table-column>
                 <el-table-column
                         prop="lotnoName"
+                        align="center"
                         label="彩种类型">
                 </el-table-column>
                 <el-table-column
-                        prop="userno"
+                        prop="name"
+                        align="center"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -100,7 +104,7 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="userno"
+                        prop="name"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
@@ -120,11 +124,13 @@
                     style="width: 100%">
                 <el-table-column
                         prop="buyuserno"
+                        align="center"
                         label="撤单类型"
                         width="180">
                 </el-table-column>
                 <el-table-column
                         label="撤单时间"
+                        align="center"
                         width="180">
                     <template slot-scope="scope">
                         {{ scope.row.canceltime | formatTime}}
@@ -132,6 +138,7 @@
                 </el-table-column>
                 <el-table-column
                         prop="createtime"
+                        align="center"
                         label="投注时间">
                     <template slot-scope="scope">
                         {{ scope.row.createtime | formatTime}}<
@@ -139,17 +146,21 @@
                 </el-table-column>
                 <el-table-column
                         prop="amt"
+                        align="center"
                         label="金额/注数">
                 </el-table-column>
                 <el-table-column
                         prop="lotnoName"
+                        align="center"
                         label="彩种">
                 </el-table-column>
                 <el-table-column
-                        prop="userno"
+                        prop="name"
+                        align="center"
                         label="用户名">
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
