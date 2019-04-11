@@ -131,7 +131,7 @@ export default {
         channel: '',
         balance: 0,
       },
-      pageSize: 20,
+      pageSize: 16,
       publishOrder: true,
       currengPage: 1,
       searchAttr: ""
