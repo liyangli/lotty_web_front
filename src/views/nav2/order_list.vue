@@ -46,6 +46,7 @@
                 <!--</el-table-column>-->
                 <el-table-column
                         prop="cancelTime"
+                        align="center"
                         label="截止时间/等待时间/金额/注数"
                         width="180">
                     <template slot-scope="scope">
@@ -54,13 +55,18 @@
                 </el-table-column>
                 <el-table-column
                         prop="lotnoName"
+                        align="center"
                         label="彩种类型">
                 </el-table-column>
                 <el-table-column
-                        prop="userno"
+                        align="center"
                         label="用户名">
+                    <template slot-scope="scope">
+                        {{ scope.row.nickName ?scope.row.nickName:scope.row.name}}
+                    </template>
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -85,8 +91,8 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="0"
                         label="中奖金额">
+                    <template slot-scope="scope">0</template>
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -100,8 +106,10 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="userno"
                         label="用户名">
+                    <template slot-scope="scope">
+                        {{ scope.row.nickName?scope.row.nickName:scope.row.name}}
+                    </template>
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -119,12 +127,16 @@
                     :data=tableData
                     style="width: 100%">
                 <el-table-column
-                        prop="buyuserno"
+                        align="center"
                         label="撤单类型"
                         width="180">
+                    <template slot-scope="scope">
+                        已撤单
+                    </template>
                 </el-table-column>
                 <el-table-column
                         label="撤单时间"
+                        align="center"
                         width="180">
                     <template slot-scope="scope">
                         {{ scope.row.canceltime | formatTime}}
@@ -132,24 +144,31 @@
                 </el-table-column>
                 <el-table-column
                         prop="createtime"
+                        align="center"
                         label="投注时间">
                     <template slot-scope="scope">
                         {{ scope.row.createtime | formatTime}}<
                     </template>
                 </el-table-column>
                 <el-table-column
-                        prop="amt"
+                        align="center"
                         label="金额/注数">
+                    <template slot-scope="scope"><span style="color:#ff3603">￥{{scope.row.amt}}</span> / {{scope.row.betnum}}</template>
                 </el-table-column>
                 <el-table-column
                         prop="lotnoName"
+                        align="center"
                         label="彩种">
                 </el-table-column>
                 <el-table-column
-                        prop="userno"
+                        align="center"
                         label="用户名">
+                    <template slot-scope="scope">
+                        {{ scope.row.nickName ?scope.row.nickName:scope.row.name}}
+                    </template>
                 </el-table-column>
                 <el-table-column
+                        align="center"
                         label="订单编号">
                     <template slot-scope="scope">
                         <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -184,7 +203,7 @@
                 second_type_checked: true,
                 tableData: [],
                 total:0,
-                pageSize: 20,
+                pageSize: 16,
                 pageNo: 1
             }
         },
@@ -196,14 +215,18 @@
         watch:{
           type:function () {
               console.info("type chenge")
-          }
+          },
+            pageNo:function () {
+                this.doQuery();
+            }
         },
         methods:{
             opearAllClick(){
                 this.first_type_checked = !this.first_type_checked;
                 for(let type of this.types){
-                    type.checked=this.first_type_checked;
+                    type.checked=false;
                 }
+                this.secondTypes =[];
                 if(!this.first_type_checked){
                     this.types[0].checked = true;
                 }
@@ -250,6 +273,7 @@
                 this.doQuery();
             },
             handleCurrentChange(val) {
+                console.info(val)
                 this.pageNo = val;
             },
             makeData(data) {
@@ -367,7 +391,6 @@
                         each.pid = info.pid;
                         each.amt = each.amt/1000;
                     }
-                    console.info(result)
                     self.tableData = list;
                     self.total = result.data.total;
                 });

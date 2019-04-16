@@ -6,6 +6,7 @@ import Table from './views/nav1/Table.vue'
 import Form from './views/nav1/Form.vue'
 import userInfo from './views/nav1/userInfo.vue'
 import user from './views/nav1/user.vue'
+import staff from './views/nav1/staff.vue'
 import order from './views/nav2/order.vue'
 import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/rewardStatistic.vue'
@@ -39,6 +40,7 @@ let routes = [
             { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/user', component: user, name: '用户管理' },
             { path: '/userInfo', component: userInfo, name: '用户详情',hidden: true },
+            { path: '/staff', component: staff, name: '员工管理' },
         ]
     },
     {
