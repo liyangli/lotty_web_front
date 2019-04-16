@@ -10,8 +10,8 @@
                 <span class="title">订单详情</span>
             </div>
             <div class="text item">
-                <span class="orderInfo" v-if="lotnoType=='JC'">用户名：{{detail.userno}}</span>
-                <span class="orderInfo" v-if="lotnoType=='SZC'">备注名：{{detail.userno}}</span>
+                <span class="orderInfo" v-if="lotnoType=='JC'">用户名：{{detail.nickName?detail.nickName:detail.name}}</span>
+                <span class="orderInfo" v-if="lotnoType=='SZC'">备注名：{{detail.nickName?detail.nickName:detail.name}}</span>
                 <span class="orderInfo">订单编号：{{detail.id}}</span>
                 <span class="orderInfo">金额：￥{{detail.amt}}[{{detail.lotmulti}}倍]</span>
                 <span class="orderInfo">{{detail.orderstate==1?"未出票":detail.orderstate==2?"已出票":"已撤单"}}</span>
@@ -40,7 +40,7 @@
                                     width="120"
                                     label="截止时间">
                                 <template slot-scope="scope">
-                                    {{ scope.row.enddate | formatTime}}
+                                    {{ scope.row.enddate}}
                                 </template>
                             </el-table-column>
                             <el-table-column
@@ -138,7 +138,7 @@
               return peilvTypes[peilv]?peilvTypes[peilv]:peilv;
           },
             formatTime:function (time){
-                return moment(time).format("YYYY-MM-DD HH:mm:ss");
+                return time?moment(time).format("YYYY-MM-DD HH:mm:ss"):"";
             }
         },
         methods: {
