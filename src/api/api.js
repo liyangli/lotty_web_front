@@ -24,3 +24,7 @@ export const addUser = params => { return axios.get(`${base}/api/user/add`, { pa
 //获取注册用户统计数据
 export const findUserStatistics = params => { return axios.get(`${base}/api/statistics/findUserTotalDataMutation`, { params: params }); };
 export const doQueryStatistics = (type,params) => { return axios.post(`${base}/api/`+type+"/statistics", params); };
+//员工管理
+export const getStaffList = params => { return axios.post(`${base}/api/staff/search`,  params).then(res => res.data); };
+export const editStaff = params => { return axios.post(`${base}/api/staff/edit`, params).then(res => res.data); };
+export const delStaff = params => { return axios.post(`${base}/api/staff/del`, params).then(res => res.data); };
