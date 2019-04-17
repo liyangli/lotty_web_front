@@ -10,7 +10,7 @@
                     :data="staffs"
                     style="width: 100%">
                 <el-table-column
-                        prop="name"
+                        prop="username"
                         align="center"
                         label="用户名"
                         width="180">
@@ -22,7 +22,7 @@
                         width="180">
                 </el-table-column>
                 <el-table-column
-                        prop="phone"
+                        prop="telphone"
                         align="center"
                         label="手机号">
                 </el-table-column>
@@ -32,7 +32,7 @@
                     <template slot-scope="scope">{{scope.row.registerDate | formatTime}}</template>
                 </el-table-column>
                 <el-table-column
-                        prop="username"
+                        prop="desc"
                         align="center"
                         label="描述">
                 </el-table-column>
@@ -60,14 +60,14 @@
                  width="30%"
                 :before-close="handleClose">
             <el-form :model="staff" :rules="rules" ref="staff" label-width="100px" class="demo-staff">
-                <el-form-item label="用户名" prop="name">
-                    <el-input v-model="staff.name"></el-input>
+                <el-form-item label="用户名" prop="username">
+                    <el-input v-model="staff.username"></el-input>
                 </el-form-item>
                 <el-form-item label="昵称" >
                     <el-input v-model="staff.nickname"></el-input>
                 </el-form-item>
-                <el-form-item label="手机号" prop="phone">
-                    <el-input v-model="staff.phone"></el-input>
+                <el-form-item label="手机号" prop="telphone">
+                    <el-input v-model="staff.telphone"></el-input>
                 </el-form-item>
                 <el-form-item label="描述" >
                     <el-input v-model="staff.desc"></el-input>
@@ -81,7 +81,7 @@
     </div>
 </template>
 <script type="text/ecmascript-6">
-    import { getUserList,addBetUser } from "../../api/api";
+    import { getStaffList,editStaff,delStaff } from "../../api/api";
     import moment from "moment";
     export default {
         data() {
@@ -93,16 +93,18 @@
                 total:0,
                 staffs: [],
                 staff:{
-                    name:'',
+                    username:'',
                     nickname:'',
-                    phone:'',
-                    desc:''
+                    telphone:'',
+                    desc:'',
+                    groupid:2,
+                    password:"123456"
                 },
                 rules: {
-                    name: [
+                    username: [
                         { required: true, message: '请输入用户名', trigger: 'blur' }
                     ],
-                    phone: [
+                    telphone: [
                         { required: true, message: '请输入用户手机号', trigger: 'blur' },
                         { min: 11, max: 11, message: '请输入正确手机号', trigger: 'blur' }
                     ]
@@ -119,10 +121,12 @@
                 let self = this;
                 self.dialogVisible = false;
                 self.staff = {
-                    name:'',
+                    username:'',
                     nickname:'',
-                    phone:'',
-                    desc:''
+                    telphone:'',
+                    desc:'',
+                    groupid:2,
+                    password:"123456"
                 }
             },
             editStaff:function (item) {
@@ -139,12 +143,19 @@
                     type: 'warning'
                 }).then(() => {
                     //执行具体的删除动作
-
-                    self.doQuery();
-                    self.$message({
-                        type: 'success',
-                        message: '删除成功!'
+                    delStaff({id:item.id}).then(data => {
+                        let error_code = data.error_code;
+                        if(error_code == 1){
+                            self.$message.error(data.msg);
+                            return;
+                        }
+                        self.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                        self.doQuery();
                     });
+
                 });
             },
             addStaff:function () {
@@ -155,22 +166,16 @@
             saveStaff:function () {
                 let self = this;
                 console.info(self.staff)
-                if(self.staff.id){
-                    //编辑员工信息
-                    console.info("bianji")
-                }else{
-                    //添加员工信息
-                    addBetUser(self.staff).then(data => {
-                        let error_code = data.error_code;
-                        if(error_code == 1){
-                            self.$message.error(data.msg);
-                            return;
-                        }
-                        self.dialogVisible = false;
-                        self.$message.info("添加成功。");
-                        self.doQuery();
-                    });
-                }
+                editStaff(self.staff).then(data => {
+                    let error_code = data.error_code;
+                    if(error_code == 1){
+                        self.$message.error(data.msg);
+                        return;
+                    }
+                    self.dialogVisible = false;
+                    self.$message.info("保存成功");
+                    self.doQuery();
+                });
 
             },
             doQuery: function() {
@@ -179,7 +184,7 @@
                     pageNo: self.currentPage,
                     pageSize: self.pageSize
                 };
-                getUserList(params).then(data => {
+                getStaffList(params).then(data => {
                     let { msg, error_code } = data;
                     if (error_code == 1) {
                         this.$message({
