@@ -12,8 +12,8 @@
         </el-form-item>
         <el-checkbox v-if="type=1" v-model="checked" checked class="remember">记住密码</el-checkbox>
         <el-form-item style="width:100%;">
-          <el-button type="primary" style="width:80%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
-          <a v-on:click="change(2)" >注册</a>
+          <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
+          <!--<a v-on:click="change(2)" >注册</a>-->
         </el-form-item>
       </el-form>
     </div>
@@ -48,7 +48,20 @@
 
 <script type="text/ecmascript-6">
   import { requestLogin,requestRegister} from '../api/api';
-  //import NProgress from 'nprogress'
+  import RouterUtil from "../routes";
+  import Home from './Home.vue'
+  import Main from './Main.vue'
+  import userInfo from './nav1/userInfo.vue'
+  import user from './nav1/user.vue'
+  import staff from './nav1/staff.vue'
+  import order from './nav2/order.vue'
+  import orderDetail from './nav2/order_detail.vue'
+  import userStatistic from './nav3/userStatistic.vue'
+  import orderStatistic from './nav3/orderStatistic.vue'
+  import takeTicket from './nav3/takeTicket.vue'
+  import rewardStatistic from './nav3/rewardStatistic.vue'
+  import Login from './Login.vue'
+  import NotFound from './404.vue'
   export default {
     data() {
       var validatePass = (rule, value, callback) => {
@@ -150,6 +163,7 @@
         this.ruleForm2={};
         this.type = type;
       },
+
       handleSubmit2(ev) {
         var _this = this;
         this.$refs.ruleForm1.validate((valid) => {
@@ -167,6 +181,15 @@
               } else {
                 sessionStorage.setItem('user', JSON.stringify(data.data));
                 console.info("登录成功。。。。");
+                let userObj = data.data;
+                let adminFlag = false;
+                if(userObj.groupid == 1){
+                    adminFlag = true;
+                }
+                let routes = RouterUtil.findRoutes(adminFlag);
+                this.$router.addRoutes(routes);
+                this.$router.options.routes= routes;
+                //动态追加路由信息，同时判断对应用户类型是什么类型
                 this.$router.push({ path: '/user' });
               }
             });

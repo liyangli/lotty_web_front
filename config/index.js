@@ -28,22 +28,10 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      "/api/login": {
+      "/api/*": {
         target: url
       },
-      "/api/register": {
-        target: url
-      },
-      "/api/betUser/*": {
-        target: url
-      },
-      "/api/order/*": {
-        target: url
-      },
-      "/api/statistics/*": {
-        target: url
-      },
-      "/api/lotno/*": {
+      "/api/*/*": {
         target: url
       }
 
