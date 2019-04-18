@@ -1,5 +1,14 @@
 <template>
     <div style="height: 100%;width:100%;">
+        员工：
+        <el-select v-model="userID" placeholder="请选择">
+            <el-option
+                    v-for="item in staffs"
+                    :key="item.id"
+                    :label="item.nickname"
+                    :value="item.id">
+            </el-option>
+        </el-select>
         <el-row :gutter="20" >
             <el-col :span="6">
                 <el-card class="box-card" shadow="never">
@@ -52,11 +61,19 @@
                         </div>
                         <div class="search-statistics">
                             <span style="float: right">
+                                开始日期：
+                                 <el-date-picker
+                                         v-model="startDate"
+                                         type="date"
+                                         size="mini"
+                                         placeholder="开始日期">
+                            </el-date-picker>
+                                结束日期：
                             <el-date-picker
-                                    v-model="date"
+                                    v-model="endDate"
                                     type="date"
                                     size="mini"
-                                    placeholder="选择日期">
+                                    placeholder="结束日期">
                             </el-date-picker>
                         </span>
                         </div>
@@ -120,14 +137,12 @@
                 </el-card>
             </el-col>
         </el-row>
-
-
     </div>
 
 </template>
 <script type="text/ecmascript-6">
     import moment from 'moment';
-    import { findUserStatistics,doQueryStatistics } from '../../api/api';
+    import { findUserStatistics,doQueryStatistics,getStaffList } from '../../api/api';
     import {findTypes} from '../../api/api';
     export default {
         data() {
@@ -152,20 +167,33 @@
                     amtCnt: 0.0,
                     list: []
                 },
-                date:moment().add(-1,"days"),
-                types:[]
-
+                startDate:moment().add(-1,"days"),
+                endDate:moment().add(0,"days"),
+                types:[],
+                staffs:[],
+                userID:null
             }
         },
         components: {
 
         },
         watch: {
-          "date": function(newVal,oldVal){
+          "startDate": function(newVal,oldVal){
               //变化自动请求获取数据
               console.info("newVal-->"+newVal);
               this.doQueryStatistics();
-          }
+          },
+            "endDate": function(newVal,oldVal){
+                //变化自动请求获取数据
+                console.info("newVal-->"+newVal);
+                this.doQueryStatistics();
+            },
+            "userID": function(newVal,oldVal){
+                //变化自动请求获取数据
+                console.info("newVal-->"+newVal);
+                this.doQuery();
+                this.doQueryStatistics();
+            }
         },
         methods: {
             handleCurrentChange(val){
@@ -185,6 +213,7 @@
             init(){
                 //初始化基础数据
                 this.findTypes();
+                this.getStaffs();
             },
             makeData(data) {
                 var pos = {};
@@ -261,10 +290,25 @@
                 }
                 return name;
             },
+            getStaffs(){
+                let self = this;
+                getStaffList().then(data => {
+                    let { msg, error_code } = data;
+                    if (error_code == 1) {
+                        this.$message({
+                            message: msg,
+                            type: "error"
+                        });
+                        return;
+                    }
+                    self.staffs = data.data.list;
+                    self.userID = self.staffs[0].id;
+                });
+            },
             //初始化查询左侧统计数据
             doQuery(){
                 let self = this;
-                findUserStatistics().then((data)=>{
+                findUserStatistics({userID:self.userID}).then((data)=>{
                     data = data.data;
                     let error = data.error_code;
                     if(error != 0){
@@ -281,7 +325,9 @@
             doQueryStatistics(){
                 let self = this;
                 let param = {
-                    date: moment(self.date).format("YYYY-MM-DD"),
+                    userID:self.userID,
+                    startDate: moment(self.startDate).format("YYYY-MM-DD"),
+                    endDate: moment(self.endDate).format("YYYY-MM-DD"),
                     curPage: self.curPage,
                     pageSize: self.pageSize
                 };
@@ -326,8 +372,8 @@
              * 2、获取对应用户列表数据；
              */
             this.init();
-            this.doQuery();
-            this.doQueryStatistics();
+//            this.doQuery();
+//            this.doQueryStatistics();
 
         },
         created(){
