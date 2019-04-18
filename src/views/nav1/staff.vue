@@ -161,6 +161,14 @@
             addStaff:function () {
                 let self = this;
                 self.title = "添加员工信息";
+                self.staff = {
+                    username:'',
+                    nickname:'',
+                    telphone:'',
+                    desc:'',
+                    groupid:2,
+                    password:"123456"
+                };
                 self.dialogVisible = true;
             },
             saveStaff:function () {
